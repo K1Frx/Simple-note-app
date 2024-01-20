@@ -4,6 +4,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from django.contrib.auth.models import User
 import hashlib
+import bleach
 
 class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes', null=True, blank=True, default=None)
@@ -19,6 +20,10 @@ class Note(models.Model):
     def save(self, *args, **kwargs):
         if self.public:
             self.encrypted = False
+        
+        allowed_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'b', 'a', 'b', 'i', 'img']
+        cleaned_content = bleach.clean(self.content, tags=allowed_tags)
+        self.content = cleaned_content
         
         if self.encrypted:
             text = self.content
@@ -42,7 +47,7 @@ class Note(models.Model):
             
             self.password = hashed_password
             self.content = encrypted_text
-            
+        
         super().save(*args, **kwargs)
 
     def get_decrypted_text(self, password):

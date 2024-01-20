@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <style>
+        .thick-black-line {
+            border: 2px solid black;
+        }
+
+        .thin-gray-line {
+            border: 1px solid gray;
+        }
+    </style>
+
+    <h2>Note Details</h2>
+    <hr class="thick-black-line">
+    <h3>Title: {{ note.title }}</h3>
+    {% if note.public %}<h3>Owner: {{ note.user }}<h3>{% endif %}
+    <hr class="thin-gray-line">
+    <p>{{ note.content|safe }}</p>
+    
+    {% if note.encrypted and not decrypted_text%}
+        <form method="post" action="{% url 'note_detail' note.id %}">
+            {% csrf_token %}
+            <label for="password">Enter Password:</label>
+            <input type="password" name="password" required>
+            <button type="submit">Decrypt</button>
+        </form>
+    {% endif %}
+    
+    {% if decrypted_text %}
+        <hr class="thin-gray-line">
+        <h3>Decrypted Text</h3>
+        <hr class="thin-gray-line">
+        <p>{{ decrypted_text|safe }}</p>
+    {% endif %}
+    </p>
+{% endblock %}

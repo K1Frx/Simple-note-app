@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        
+        ul li a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+    </style>
+    <h2>Public Notes</h2>
+    <ul>
+        {% for note in public_notes %}
+            <li><a href="{% url 'note_detail' note.id %}">{{ note.title }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <h2>Your Notes</h2>
+    <ul>
+        {% for note in my_notes %}
+            <li><a href="{% url 'note_detail' note.id %}">{{note.title}}{% if note.encrypted %} - 🔒 {% endif %}{% if note.public %} - 🌐 {% endif %}</a></li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'add_note' %}"><button>Add Note</button></a>
+    <p>
+{% endblock %}
