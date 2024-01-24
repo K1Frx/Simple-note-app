@@ -23,12 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-#^36s5y5j8j_6u@ots&45ye0f0h$))=4hcl(ub5hwb#nm1evtq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = [
-    '*'
-]
-
+ALLOWED_HOSTS = ['localhost']
 
 # Application definition
 
@@ -132,3 +129,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AXES_FAILURE_LIMIT = 3
 AXES_COOLOFF_TIME = 0.01
 AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
+
+CSRF_TRUSTED_ORIGINS = ['https://localhost']
