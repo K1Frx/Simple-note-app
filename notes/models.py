@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives import padding
 from django.contrib.auth.models import User
 import hashlib
 import bleach
+from bs4 import BeautifulSoup
 
 class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes', null=True, blank=True, default=None)
@@ -13,16 +14,33 @@ class Note(models.Model):
     public = models.BooleanField(default=False, blank=True)
     encrypted = models.BooleanField(default=False, blank=True)
     password = models.TextField(blank=True, default="")
-    
+
     def __str__(self):
         return self.title
+    
+    def pre_cleaning(self, content):
+        soup = BeautifulSoup(content, 'html.parser')
+        
+        for img_tag in soup.find_all('img'):
+            src = img_tag['src']
+            if (not (str(src).startswith('http') or str(src).startswith('https'))) or "javascript:" in str(src):
+                img_tag['src'] = ''
+                
+        for img_tag in soup.find_all('a'):
+            src = img_tag['href']
+            if (not (str(src).startswith('http') or str(src).startswith('https'))) or "javascript:" in str(src):
+                img_tag['href'] = ''
+        return str(soup)
     
     def save(self, *args, **kwargs):
         if self.public:
             self.encrypted = False
         
         allowed_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'b', 'a', 'b', 'i', 'img']
-        cleaned_content = bleach.clean(self.content, tags=allowed_tags)
+        allowed_attributes = {'img': ['src'], 'a': ['href']}
+        
+        almost_cleaned_content = self.pre_cleaning(self.content)
+        cleaned_content = bleach.clean(almost_cleaned_content, tags=allowed_tags, attributes=allowed_attributes)
         self.content = cleaned_content
         
         if self.encrypted:

@@ -9,12 +9,19 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+import time
 
 # Create your views here.
+
+DELAY_SECONDS = 2
 
 class SimpleLoginView(LoginView):
     form_class = LoginForm
     template_name = 'notes/login.html'
+    
+    def form_valid(self, form):
+        time.sleep(DELAY_SECONDS)
+        return super().form_valid(form)
     
 class SimpleRegisterView(CreateView):
     form_class = RegisterForm
